@@ -1,0 +1,36 @@
+get.mid<-function(beg,end,a){
+	if(a==0){
+		return(NULL);
+	}
+	if(a==1){
+		return(end);
+	}
+	if(a==2){
+		return(c(beg,end));
+	}
+	layers<-c(beg,(beg+end)/2,end);
+	a=a-3;
+	while(a>0){
+		len<-length(layers);
+		mids<-c();
+		for(i in 1:(len-1)){
+			mids<-c(mids,(layers[i]+layers[i+1])/2);
+		}
+		len.mids<-length(mids);
+		if(a>=len.mids){
+			layers<-sort(c(layers,mids));
+			a=a-len.mids;
+		}
+		else{
+			layers<-sort(c(layers,mids[1:a]));
+			break;
+		}
+	}
+	layers<-unique(floor(layers));
+	if(length(layers)<a){
+		sd<-setdiff(beg:end,layers);
+		sd.sp<-sample(sd,(a-length(layers)));
+		layers<-sort(c(layers,sd.sp));
+	}
+	return(layers);
+}	
