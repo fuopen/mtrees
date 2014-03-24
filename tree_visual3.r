@@ -40,7 +40,7 @@ gen.treeind<-function(dt,key,M=20){
 	ind.max<-which.max(dt[[key]]);
 	n<-length(dt[[key]]);
 	if(n<=M){
-		return(1:M);
+		return(1:n);
 	}
 	indx<-c();
 	if(ind.max==1){
@@ -221,6 +221,38 @@ plot.forest<-function(filename,region){
 			rect.height<-(rect.ceil-rect.floor)*(region[[1]][['time']][i]-rect.min)/(rect.max-rect.min)+rect.floor;
 			recty<-c(recty,rect.height);
 			rect(signals.beg[i],rect.floor,signals.end[i],rect.height,density=30,col=region[[1]][['col']][i]);
+			if(signals.len==1){
+				rect.scale=(rect.max-rect.min)/(rect.ceil-rect.floor);
+				time.axis.at=round(seq(ylim.l,ylim.r,(ylim.r-ylim.l)/4));
+				time.axis.label=round((seq(ylim.l,ylim.r,(ylim.r-ylim.l)/4)-ylim.l)*rect.scale+rect.min);
+				axis(side=4,tck=-0.03,labels=NA);
+				axis(side=4,line=-1.08,cex.axis=0.73,at=time.axis.at,labels=time.axis.label,lwd=0);	
+				usr.r<-par('usr');
+				text(usr.r[2],usr.r[4],'time',adj=c(1,1),cex=0.8,font=3);
+				bar.l=0.915;
+				bar.r=0.985;
+				bar.b=pos.ysign[1]+(pos.ysign[2]-pos.ysign[1])*0.4;
+				bar.t=pos.ysign[1]+(pos.ysign[2]-pos.ysign[1])*0.8;
+				lines(signals.pos,signals.h2,col=h2.color,lwd=1.4);
+				lines(signals.pos,signals.h1,col=h1.color,lwd=1.4);
+				######################################################
+				abs.sigbeg<-grconvertX(signals.beg,'user','ndc');
+				abs.sigend<-grconvertX(signals.end,'user','ndc');
+				abs.treecoordtx<-grconvertX(signals.pos,'user','ndc');
+				abs.sigpy1<-grconvertY(signals.h2,'user','ndc');
+				abs.sigpy2<-grconvertY(recty,'user','ndc');
+				abs.treecoordty<-(abs(abs.sigpy1+abs.sigpy2)+abs(abs.sigpy1-abs.sigpy2))/2;
+				######################################################
+				par(new=T,plt=c(bar.l,bar.r,bar.b,bar.t),xaxs='i');
+				plot(-0.2,0.8,xlab=NA,ylab=NA,axes=F,cex=1.5*h.cex,pch=18,col=h2.color,xlim=c(-0.52,0.92),ylim=c(-1,1));
+				text(0.3,0.8,'h2',col=h2.color,cex=h.cex);
+				points(-0.2,0.4,cex=1.2*h.cex,pch=19,col=h1.color);
+				segments(-0.23,0.8,-0.18,0.8,col=h2.color,lwd=2.3);
+				segments(-0.23,0.4,-0.18,0.4,col=h1.color,lwd=2.3);
+				text(0.3,0.4,'h1',col=h1.color,cex=h.cex);
+				rect(-0.35,-0.8,-0.10,0.0,density=30,col='red');
+				text(0.35,-0.45,'time',col='red',cex=1.1*h.cex);	
+			}
 		}
 		else{
 			points(signals.pos[i],signals.h2[i],col=h2.color,cex=2*h.cex,pch=18);
@@ -400,10 +432,10 @@ plot.pop<-function(input.dir,prefix,gene_file,output.dir){
 	by(Cand,list(Cand$chr,Cand$start),makeplot,Res.files=res.files,Tree.files=tree.files,Int.files=int.files,prefix=prefix,output.dir=output.dir,gene.data=gene);
 }
 
-#args<-commandArgs(T);
-#indir<-args[1];
-#prefix<-args[2];
-#gene_file<-args[3];
-#outdir<-args[4];
-#plot.pop(indir,prefix,gene_file,outdir);
-#q(save='no');
+args<-commandArgs(T);
+indir<-args[1];
+prefix<-args[2];
+gene_file<-args[3];
+outdir<-args[4];
+plot.pop(indir,prefix,gene_file,outdir);
+q(save='no');
